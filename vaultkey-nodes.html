@@ -1,0 +1,78 @@
+<style>
+    .red-ui-flow-node[type^="gf-"] rect.red-ui-flow-node { fill: #000 !important; width: 35px !important; height: 35px !important; stroke-width: 3px !important; }
+    .red-ui-flow-node[type^="gf-"] g.red-ui-flow-node-label-group { display: none !important; }
+    .red-ui-flow-node[type^="gf-"] .red-ui-flow-node-icon-group { transform: translate(7px, 7px) !important; }
+    .red-ui-flow-node[type^="gf-"] .red-ui-flow-node-icon { color: #fff !important; fill: #fff !important; font-size: 20px !important; }
+    .red-ui-flow-node[type="gf-master-key"] rect.red-ui-flow-node { stroke: #39FF14 !important; }
+    .red-ui-flow-node[type="gf-burner"] rect.red-ui-flow-node { stroke: #FF003F !important; }
+</style>
+
+<script type="text/javascript">
+    RED.nodes.registerType('gf-master-key', {
+        category: 'GhostForge',
+        color: '#000',
+        showLabel: false,
+        defaults: {
+            name:      { value: "" },
+            projectId: { value: "" },
+            items:     { value: [] }
+        },
+        inputs: 1, outputs: 1,
+        icon: "font-awesome/fa-key",
+        align: 'left',
+        label: function() { return ""; },
+        oneditprepare: function() {
+            var list = $("#node-input-items-container").editableList({
+                addItem: function(container, i, data) {
+                    var row = $('<div/>').appendTo(container);
+                    var type = $('<select/>', {style:"width:35%"}).appendTo(row);
+                    type.append($("<option/>").val("auth").text("GCP Auth"))
+                        .append($("<option/>").val("secret").text("GCP Secret"));
+                    var name = $('<input/>', {style:"width:55%; margin-left:10px", type:"text", placeholder:"Secret Name"}).appendTo(row);
+                    if (data.t) type.val(data.t);
+                    if (data.n) name.val(data.n);
+                },
+                removable: true,
+                height: 300
+            });
+            this.items.forEach(item => list.editableList('addItem', item));
+        },
+        oneditsave: function() {
+            var items = $("#node-input-items-container").editableList('items');
+            var node = this;
+            node.items = [];
+            items.each(function() {
+                node.items.push({
+                    t: $(this).find("select").val(),
+                    n: $(this).find("input").val()
+                });
+            });
+        }
+    });
+
+    RED.nodes.registerType('gf-burner', {
+        category: 'GhostForge',
+        color: '#000',
+        showLabel: false,
+        defaults: { name: { value: "" } },
+        inputs: 1, outputs: 1,
+        icon: "font-awesome/fa-fire",
+        align: 'right',
+        label: function() { return ""; }
+    });
+</script>
+
+<script type="text/html" data-template-name="gf-master-key">
+    <div class="form-row">
+        <label><i class="fa fa-server"></i> GCP Project ID</label>
+        <input type="text" id="node-input-projectId" placeholder="my-gcp-project">
+    </div>
+    <div class="form-row">
+        <ol id="node-input-items-container"></ol>
+    </div>
+    <div class="form-tips"><b>GhostForge Master Key</b> — JIT token from GCP Metadata Server. Secrets from Secret Manager. Zero persistence.</div>
+</script>
+
+<script type="text/html" data-template-name="gf-burner">
+    <div class="form-tips"><b>GhostForge Burner</b> — Deletes msg.secret immediately after use. No secrets travel further in the flow.</div>
+</script>
