@@ -1,0 +1,56 @@
+<script type="text/javascript">
+(function() {
+    var arrows = [
+        { type: "gf-arrow-up",    icon: "arrow-up.svg"    },
+        { type: "gf-arrow-down",  icon: "arrow-down.svg"  },
+        { type: "gf-arrow-left",  icon: "arrow-left.svg"  },
+        { type: "gf-arrow-right", icon: "arrow-right.svg" }
+    ];
+    arrows.forEach(function(a) {
+        RED.nodes.registerType(a.type, {
+            category:  "GhostForge",
+            color:     "#000000",
+            showLabel: false,
+            defaults:  { name: { value: "" } },
+            inputs:    1,
+            outputs:   1,
+            icon:      a.icon,
+            label:     function() { return this.name || a.type; }
+        });
+    });
+})();
+</script>
+
+<script type="text/html" data-template-name="gf-arrow-up">
+    <div class="form-tips"><b>GhostForge Arrow Up</b> — Visual routing node. Passes msg unchanged.</div>
+</script>
+<script type="text/html" data-template-name="gf-arrow-down">
+    <div class="form-tips"><b>GhostForge Arrow Down</b> — Visual routing node. Passes msg unchanged.</div>
+</script>
+<script type="text/html" data-template-name="gf-arrow-left">
+    <div class="form-tips"><b>GhostForge Arrow Left</b> — Visual routing node. Passes msg unchanged.</div>
+</script>
+<script type="text/html" data-template-name="gf-arrow-right">
+    <div class="form-tips"><b>GhostForge Arrow Right</b> — Visual routing node. Passes msg unchanged.</div>
+</script>
+
+<script type="text/html" data-help-name="gf-arrow-up">
+    <p>Visual routing node pointing <strong>up</strong>. Passes <code>msg</code> through unchanged.</p>
+    <p>Use arrow nodes to indicate flow direction in complex layouts. No effect on the message — purely visual.</p>
+    <p>Part of the <strong>GhostForge™</strong> toolkit.</p>
+</script>
+<script type="text/html" data-help-name="gf-arrow-down">
+    <p>Visual routing node pointing <strong>down</strong>. Passes <code>msg</code> through unchanged.</p>
+    <p>Use arrow nodes to indicate flow direction in complex layouts. No effect on the message — purely visual.</p>
+    <p>Part of the <strong>GhostForge™</strong> toolkit.</p>
+</script>
+<script type="text/html" data-help-name="gf-arrow-left">
+    <p>Visual routing node pointing <strong>left</strong>. Passes <code>msg</code> through unchanged.</p>
+    <p>Use arrow nodes to indicate flow direction in complex layouts. No effect on the message — purely visual.</p>
+    <p>Part of the <strong>GhostForge™</strong> toolkit.</p>
+</script>
+<script type="text/html" data-help-name="gf-arrow-right">
+    <p>Visual routing node pointing <strong>right</strong>. Passes <code>msg</code> through unchanged.</p>
+    <p>Use arrow nodes to indicate flow direction in complex layouts. No effect on the message — purely visual.</p>
+    <p>Part of the <strong>GhostForge™</strong> toolkit.</p>
+</script>

@@ -1,0 +1,75 @@
+<script type="text/javascript">
+    RED.nodes.registerType('gf-gate-opener', {
+        category:  'GhostForge',
+        color:     '#000000',
+        showLabel: false,
+        defaults: {
+            name:  { value: "" },
+            topic: { value: "api-call", required: true }
+        },
+        inputs:  1,
+        outputs: 1,
+        icon:    "gate-opener.svg",
+        label:   function() { return this.name || "gate-opener"; }
+    });
+
+    RED.nodes.registerType('gf-gate-closer', {
+        category:  'GhostForge',
+        color:     '#000000',
+        showLabel: false,
+        defaults: {
+            name:  { value: "" },
+            topic: { value: "api-call", required: true },
+            delay: { value: 4000, required: true, validate: RED.validators.number() }
+        },
+        inputs:  1,
+        outputs: 1,
+        align:   'right',
+        icon:    "gate-closer.svg",
+        label:   function() { return this.name || "gate-closer"; }
+    });
+</script>
+
+<script type="text/html" data-template-name="gf-gate-opener">
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-lock"></i> Topic</label>
+        <input type="text" id="node-input-topic" placeholder="e.g. api-call">
+    </div>
+    <div class="form-tips"><b>GhostForge Gate Opener</b> — Passes through when gate is free. Queues messages when gate is open. Must match Gate Closer topic.</div>
+</script>
+
+<script type="text/html" data-template-name="gf-gate-closer">
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-unlock"></i> Topic</label>
+        <input type="text" id="node-input-topic" placeholder="Must match Gate Opener topic">
+    </div>
+    <div class="form-row">
+        <label for="node-input-delay"><i class="fa fa-clock-o"></i> Delay (ms)</label>
+        <input type="number" id="node-input-delay" placeholder="4000">
+    </div>
+    <div class="form-tips"><b>GhostForge Gate Closer</b> — Waits delay ms then releases gate. Next queued message fires automatically.</div>
+</script>
+
+<script type="text/html" data-help-name="gf-gate-opener">
+    <p>Serializes API calls by queuing messages when a gate is already open.</p>
+    <h3>Configuration</h3>
+    <dl class="message-properties">
+        <dt>Topic <span class="property-type">string</span></dt>
+        <dd>Unique gate name. Must match the paired <code>gf-gate-closer</code>.</dd>
+    </dl>
+    <h3>Usage</h3>
+    <pre>[msg] → [gf-gate-opener] → [API call] → [gf-gate-closer]</pre>
+    <p>Part of the <strong>GhostForge™</strong> toolkit.</p>
+</script>
+
+<script type="text/html" data-help-name="gf-gate-closer">
+    <p>Releases the FlowGate after an API call completes.</p>
+    <h3>Configuration</h3>
+    <dl class="message-properties">
+        <dt>Topic <span class="property-type">string</span></dt>
+        <dd>Must match the paired <code>gf-gate-opener</code>.</dd>
+        <dt>Delay <span class="property-type">number (ms)</span></dt>
+        <dd>Milliseconds to wait before releasing. Default: 4000ms.</dd>
+    </dl>
+    <p>Part of the <strong>GhostForge™</strong> toolkit.</p>
+</script>
