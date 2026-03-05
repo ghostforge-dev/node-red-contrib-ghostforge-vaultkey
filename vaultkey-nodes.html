@@ -35,12 +35,12 @@
         defaults: {
             name:      { value: "" },
             projectId: { value: "" },
-            items:     { value: [] }
+            items:     { value: [] },
+            l:         { value: false }
         },
         inputs: 1, outputs: 1,
         icon:  "font-awesome/fa-key",
         align: 'left',
-        label: function() { return " "; },
         labelStyle: function() { return ""; },
         oneditprepare: function() {
             var list = $("#node-input-items-container").editableList({
@@ -75,12 +75,10 @@
         category:  'GhostForge',
         color:     '#000',
         showLabel: false,
-        defaults: { name: { value: "" } },
+        defaults: { name: { value: "" }, l: { value: false } },
         inputs: 1, outputs: 1,
         icon:  "font-awesome/fa-fire",
         align: 'right',
-        label: function() { return " "; },
-        labelStyle: function() { return ""; }
     });
 </script>
 
