@@ -1,16 +1,36 @@
 <style>
-    .red-ui-flow-node[type^="gf-"] rect.red-ui-flow-node { fill: #000 !important; width: 35px !important; height: 35px !important; stroke-width: 3px !important; }
-    .red-ui-flow-node[type^="gf-"] g.red-ui-flow-node-label-group { display: none !important; }
-    .red-ui-flow-node[type^="gf-"] .red-ui-flow-node-icon-group { transform: translate(7px, 7px) !important; }
-    .red-ui-flow-node[type^="gf-"] .red-ui-flow-node-icon { color: #fff !important; fill: #fff !important; font-size: 20px !important; }
-    .red-ui-flow-node[type="gf-master-key"] rect.red-ui-flow-node { stroke: #39FF14 !important; }
-    .red-ui-flow-node[type="gf-burner"] rect.red-ui-flow-node { stroke: #FF003F !important; }
+    .red-ui-flow-node[type="gf-master-key"] rect.red-ui-flow-node-background,
+    .red-ui-flow-node[type="gf-burner"] rect.red-ui-flow-node-background {
+        fill: #000 !important;
+        stroke-width: 3px !important;
+    }
+    .red-ui-flow-node[type="gf-master-key"] rect.red-ui-flow-node-background { stroke: #39FF14 !important; }
+    .red-ui-flow-node[type="gf-burner"] rect.red-ui-flow-node-background      { stroke: #FF003F !important; }
+
+    .red-ui-flow-node[type="gf-master-key"] .red-ui-flow-node-label-group,
+    .red-ui-flow-node[type="gf-burner"] .red-ui-flow-node-label-group,
+    .red-ui-flow-node[type="gf-master-key"] text.red-ui-flow-node-label,
+    .red-ui-flow-node[type="gf-burner"] text.red-ui-flow-node-label {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    .red-ui-flow-node[type="gf-master-key"] .red-ui-flow-node-icon-group,
+    .red-ui-flow-node[type="gf-burner"] .red-ui-flow-node-icon-group {
+        transform: translate(7px, 7px) !important;
+    }
+    .red-ui-flow-node[type="gf-master-key"] .red-ui-flow-node-icon,
+    .red-ui-flow-node[type="gf-burner"] .red-ui-flow-node-icon {
+        color: #fff !important;
+        fill: #fff !important;
+        font-size: 20px !important;
+    }
 </style>
 
 <script type="text/javascript">
     RED.nodes.registerType('gf-master-key', {
-        category: 'GhostForge',
-        color: '#000',
+        category:  'GhostForge',
+        color:     '#000',
         showLabel: false,
         defaults: {
             name:      { value: "" },
@@ -18,9 +38,10 @@
             items:     { value: [] }
         },
         inputs: 1, outputs: 1,
-        icon: "font-awesome/fa-key",
+        icon:  "font-awesome/fa-key",
         align: 'left',
-        label: function() { return ""; },
+        label: function() { return " "; },
+        labelStyle: function() { return ""; },
         oneditprepare: function() {
             var list = $("#node-input-items-container").editableList({
                 addItem: function(container, i, data) {
@@ -51,14 +72,15 @@
     });
 
     RED.nodes.registerType('gf-burner', {
-        category: 'GhostForge',
-        color: '#000',
+        category:  'GhostForge',
+        color:     '#000',
         showLabel: false,
         defaults: { name: { value: "" } },
         inputs: 1, outputs: 1,
-        icon: "font-awesome/fa-fire",
+        icon:  "font-awesome/fa-fire",
         align: 'right',
-        label: function() { return ""; }
+        label: function() { return " "; },
+        labelStyle: function() { return ""; }
     });
 </script>
 
@@ -75,4 +97,40 @@
 
 <script type="text/html" data-template-name="gf-burner">
     <div class="form-tips"><b>GhostForge Burner</b> — Deletes msg.secret immediately after use. No secrets travel further in the flow.</div>
+</script>
+
+<script type="text/html" data-help-name="gf-master-key">
+    <p>Fetches a fresh GCP access token and optional secrets from GCP Secret Manager on every message. Zero persistence — nothing is ever stored.</p>
+    <h3>How it works</h3>
+    <p>On each incoming message, the node calls the GCP Metadata Server to obtain a fresh short-lived access token. It then fetches any configured secrets from GCP Secret Manager and places them in <code>msg.secret</code>.</p>
+    <h3>Configuration</h3>
+    <dl class="message-properties">
+        <dt>GCP Project ID <span class="property-type">string</span></dt>
+        <dd>Your Google Cloud project ID.</dd>
+        <dt>Items <span class="property-type">list</span></dt>
+        <dd>Add <strong>GCP Auth</strong> to fetch the access token, or <strong>GCP Secret</strong> with the secret name to fetch a value from Secret Manager.</dd>
+    </dl>
+    <h3>Output</h3>
+    <p>Secrets are available as <code>msg.secret["secret-name"]</code> downstream. Always pair with <code>gf-burner</code> to destroy secrets after use.</p>
+    <h3>Requirements</h3>
+    <ul>
+        <li>Must run on a GCP VM with a service account</li>
+        <li>Service account needs <code>Secret Manager Secret Accessor</code> role</li>
+    </ul>
+    <p>Part of the <strong>GhostForge™</strong> toolkit.</p>
+</script>
+
+<script type="text/html" data-help-name="gf-burner">
+    <p>Destroys <code>msg.secret</code> immediately after use. Ensures secrets never travel further in the flow than necessary.</p>
+    <h3>How it works</h3>
+    <p>Deletes the <code>msg.secret</code> property from the message object and passes the message through unchanged. Place this node directly after the last node that needs access to the secrets.</p>
+    <h3>Usage</h3>
+    <pre>[gf-master-key] → [your node] → [gf-burner] → [next node]</pre>
+    <h3>Notes</h3>
+    <ul>
+        <li>Always use this node after <code>gf-master-key</code></li>
+        <li>The rest of the message passes through unchanged</li>
+        <li>If <code>msg.secret</code> doesn't exist, the node does nothing and passes the message through</li>
+    </ul>
+    <p>Part of the <strong>GhostForge™</strong> toolkit.</p>
 </script>
